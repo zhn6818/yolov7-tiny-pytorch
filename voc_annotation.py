@@ -77,7 +77,7 @@ if __name__ == "__main__":
                 total_xml.append(xml)
 
         num     = len(total_xml)  
-        list    = range(num)  
+        list    = range(num)   
         tv      = int(num*trainval_percent)  
         tr      = int(tv*train_percent)  
         trainval= random.sample(list,tv)  
