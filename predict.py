@@ -7,6 +7,7 @@ import time
 import cv2
 import numpy as np
 from PIL import Image
+import os
 
 from yolo import YOLO
 
@@ -90,6 +91,7 @@ if __name__ == "__main__":
             else:
                 r_image = yolo.detect_image(image, crop = crop, count=count)
                 r_image.show()
+                r_image.save(os.path.join(dir_save_path, img.split('/')[-1].replace(".jpg", ".png")))
 
     elif mode == "video":
         capture = cv2.VideoCapture(video_path)
