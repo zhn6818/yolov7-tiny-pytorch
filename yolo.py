@@ -25,7 +25,10 @@ class YOLO(object):
         #   验证集损失较低不代表mAP较高，仅代表该权值在验证集上泛化性能较好。
         #   如果出现shape不匹配，同时要注意训练时的model_path和classes_path参数的修改
         #--------------------------------------------------------------------------#
-        "model_path"        : 'logs/ep120-loss0.070-val_loss0.040.pth',
+        # ep120-loss0.070-val_loss0.040_t.pth
+        
+        "model_path"        : 'logs/best_epoch_weights.pth',
+        # "model_path"        : 'logs/ep120-loss0.070-val_loss0.040_t.pth',
         "classes_path"      : 'model_data/voc_classes.txt',
         #---------------------------------------------------------------------#
         #   anchors_path代表先验框对应的txt文件，一般不修改。
@@ -40,7 +43,7 @@ class YOLO(object):
         #---------------------------------------------------------------------#
         #   只有得分大于置信度的预测框会被保留下来
         #---------------------------------------------------------------------#
-        "confidence"        : 0.5,
+        "confidence"        : 0.3,
         #---------------------------------------------------------------------#
         #   非极大抑制所用到的nms_iou大小
         #---------------------------------------------------------------------#
@@ -269,7 +272,7 @@ class YOLO(object):
         tact_time = (t2 - t1) / test_interval
         return tact_time
 
-    def detect_heatmap(self, image, heatmap_save_path):
+    def detect_heatmap(self, image, heatmap_save_path, imgfile):
         import cv2
         import matplotlib.pyplot as plt
         def sigmoid(x):
@@ -306,6 +309,7 @@ class YOLO(object):
             sub_output = sub_output.cpu().numpy()
             b, c, h, w = np.shape(sub_output)
             sub_output = np.transpose(np.reshape(sub_output, [b, 3, -1, h, w]), [0, 3, 4, 1, 2])[0]
+            tmp = sub_output[..., 4]
             score      = np.max(sigmoid(sub_output[..., 4]), -1)
             score      = cv2.resize(score, (image.size[0], image.size[1]))
             normed_score    = (score * 255).astype('uint8')
@@ -316,9 +320,10 @@ class YOLO(object):
         plt.axis('off')
         plt.subplots_adjust(top=1, bottom=0, right=1,  left=0, hspace=0, wspace=0)
         plt.margins(0, 0)
-        plt.savefig(heatmap_save_path, dpi=200, bbox_inches='tight', pad_inches = -0.1)
-        print("Save to the " + heatmap_save_path)
+        plt.savefig(heatmap_save_path + imgfile, dpi=200, bbox_inches='tight', pad_inches = -0.1)
+        print("Save to the " + heatmap_save_path + imgfile)
         plt.show()
+        plt.close()
 
     def convert_to_onnx(self, simplify, model_path):
         import onnx

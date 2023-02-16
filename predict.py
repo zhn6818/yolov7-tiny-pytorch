@@ -8,10 +8,17 @@ import cv2
 import numpy as np
 from PIL import Image
 import os
+import argparse
 
 from yolo import YOLO
 
 if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--mode', type=str, default="predict", help='predict mode')
+    parser.add_argument('--filepath', type=str, default="img/", help='predict mode')
+    opt = parser.parse_args()
+    
     yolo = YOLO()
     #----------------------------------------------------------------------------------------------------------#
     #   mode用于指定测试的模式：
@@ -22,7 +29,7 @@ if __name__ == "__main__":
     #   'heatmap'           表示进行预测结果的热力图可视化，详情查看下方注释。
     #   'export_onnx'       表示将模型导出为onnx，需要pytorch1.7.1以上。
     #----------------------------------------------------------------------------------------------------------#
-    mode = "predict"
+    mode = opt.mode
     #-------------------------------------------------------------------------#
     #   crop                指定了是否在单张图片预测后对目标进行截取
     #   count               指定了是否进行目标的计数
@@ -64,7 +71,7 @@ if __name__ == "__main__":
     #   
     #   heatmap_save_path仅在mode='heatmap'有效
     #-------------------------------------------------------------------------#
-    heatmap_save_path = "model_data/heatmap_vision.png"
+    heatmap_save_path = "heatmap/"
     #-------------------------------------------------------------------------#
     #   simplify            使用Simplify onnx
     #   onnx_save_path      指定了onnx的保存路径
@@ -169,10 +176,25 @@ if __name__ == "__main__":
                 print('Open Error! Try again!')
                 continue
             else:
-                yolo.detect_heatmap(image, heatmap_save_path)
+                yolo.detect_heatmap(image, heatmap_save_path, img)
                 
     elif mode == "export_onnx":
         yolo.convert_to_onnx(simplify, onnx_save_path)
+    
+    elif mode == "fileheatmap":
+        
+        listfile = os.listdir(opt.filepath)
+        for listfile in listfile:
+            print("filename: ", listfile)
+            filepath = opt.filepath + listfile
+            
+            try:
+                image = Image.open(filepath)
+            except:
+                print('Open Error! Try again!')
+                continue
+            else:
+                yolo.detect_heatmap(image, heatmap_save_path, listfile)
         
     else:
         raise AssertionError("Please specify the correct mode: 'predict', 'video', 'fps', 'heatmap', 'export_onnx', 'dir_predict'.")

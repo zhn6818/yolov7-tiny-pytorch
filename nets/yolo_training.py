@@ -16,9 +16,9 @@ class YOLOLoss(nn.Module):
     def __init__(self, anchors, num_classes, input_shape, anchors_mask = [[6,7,8], [3,4,5], [0,1,2]], label_smoothing = 0):
         super(YOLOLoss, self).__init__()
         #-----------------------------------------------------------#
-        #   13x13的特征层对应的anchor是[142, 110],[192, 243],[459, 401]
-        #   26x26的特征层对应的anchor是[36, 75],[76, 55],[72, 146]
-        #   52x52的特征层对应的anchor是[12, 16],[19, 36],[40, 28]
+        #   20*20的特征层对应的anchor是[142, 110],[192, 243],[459, 401]
+        #   40*40的特征层对应的anchor是[36, 75],[76, 55],[72, 146]
+        #   80*80的特征层对应的anchor是[12, 16],[19, 36],[40, 28]
         #-----------------------------------------------------------#
         self.anchors        = [anchors[mask] for mask in anchors_mask]
         self.num_classes    = num_classes
